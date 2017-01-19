@@ -611,7 +611,6 @@ copy_ies_to_response(RequestIEs, ResponseIEs0, [H|T]) ->
 	end,
     copy_ies_to_response(RequestIEs, ResponseIEs, T).
 
-
 send_end_marker(#context{data_port = GtpPort, remote_data_ip = PeerIP, remote_data_tei = RemoteTEI}) ->
     Msg = #gtp{version = v1, type = end_marker, tei = RemoteTEI, ie = []},
     Data = gtp_packet:encode(Msg),
@@ -632,10 +631,10 @@ delete_context(From, Context) ->
     RequestIEs = gtp_v2_c:build_recovery(Context, false, RequestIEs0),
     send_request(Context, ?T3, ?N3, delete_bearer_request, RequestIEs, From).
 
-dp_args(#context{ms_v4 = {MSv4,_}}) ->
-    MSv4;
-dp_args(_) ->
-    undefined.
+dp_args(#context{vrf = VRF, ms_v4 = {MSv4,_}}) ->
+    {vrf, VRF, MSv4};
+dp_args(#context{vrf = VRF}) ->
+    {vrf, VRF, undefined}.
 
 dp_create_pdp_context(Context) ->
     Args = dp_args(Context),

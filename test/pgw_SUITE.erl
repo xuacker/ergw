@@ -39,8 +39,7 @@
 				       {'$remote_port', ?GTP1c_PORT * 4}
 				      ]},
 				{grx, [{type, 'gtp-u'},
-				       {node, 'gtp-u-node@localhost'},
-				       {name, 'grx'}]}
+				       {name, 'socket-grx'}]}
 			       ]},
 
 			      {vrfs,

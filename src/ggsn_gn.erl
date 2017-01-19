@@ -549,10 +549,10 @@ delete_context(From, Context) ->
     RequestIEs = gtp_v1_c:build_recovery(Context, false, RequestIEs0),
     send_request(Context, ?T3, ?N3, delete_pdp_context_request, RequestIEs, From).
 
-dp_args(#context{ms_v4 = {MSv4,_}}) ->
-    MSv4;
-dp_args(_) ->
-    undefined.
+dp_args(#context{vrf = VRF, ms_v4 = {MSv4,_}}) ->
+    {vrf, VRF, MSv4};
+dp_args(#context{vrf = VRF}) ->
+    {vrf, VRF, undefined}.
 
 dp_create_pdp_context(Context) ->
     Args = dp_args(Context),

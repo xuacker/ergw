@@ -99,7 +99,6 @@ meck_init(Config) ->
 			     {ok, self()}
 		     end),
     ok = meck:expect(gtp_dp, send, fun(_GtpPort, _IP, _Port, _Data) -> ok end),
-    ok = meck:expect(gtp_dp, get_id, fun(_GtpPort) -> self() end),
     ok = meck:expect(gtp_dp, create_pdp_context, fun(_Context, _Args) -> ok end),
     ok = meck:expect(gtp_dp, update_pdp_context, fun(_Context, _Args) -> ok end),
     ok = meck:expect(gtp_dp, delete_pdp_context, fun(_Context, _Args) -> ok end),

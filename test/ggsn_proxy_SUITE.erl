@@ -39,8 +39,7 @@
 				       {'$remote_port', ?GTP1c_PORT * 4}
 				      ]},
 				{grx, [{type, 'gtp-u'},
-				       {node, 'gtp-u-node@localhost'},
-				       {name, 'grx'}
+				       {name, 'socket-grx'}
 				      ]},
 				{'proxy-irx', [{type, 'gtp-c'},
 					       {ip,  {127,0,0,1}},
@@ -49,8 +48,7 @@
 					       {'$remote_port', ?GTP1c_PORT * 3}
 					      ]},
 				{'proxy-grx', [{type, 'gtp-u'},
-					       {node, 'gtp-u-proxy@vlx161-tpmd'},
-					       {name, 'proxy-grx'}
+					       {name, 'socket-proxy-grx'}
 					      ]},
 				{'remote-irx', [{type, 'gtp-c'},
 						{ip,  {127,0,0,1}},
@@ -59,8 +57,7 @@
 						{'$remote_port', ?GTP1c_PORT * 2}
 					       ]},
 				{'remote-grx', [{type, 'gtp-u'},
-						{node, 'gtp-u-node@localhost'},
-						{name, 'remote-grx'}
+						{name, 'socket-remote-grx'}
 					       ]}
 			       ]},
 
