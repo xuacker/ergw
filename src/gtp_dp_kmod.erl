@@ -14,7 +14,8 @@
 -export([start_link/1, send/4, get_id/1,
 	 create_pdp_context/2,
 	 update_pdp_context/2,
-	 delete_pdp_context/2]).
+	 delete_pdp_context/2,
+	 get_accounting/1]).
 
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
@@ -50,6 +51,10 @@ update_pdp_context(#context{data_port = GtpPort, remote_data_ip = PeerIP,
 delete_pdp_context(#context{data_port = GtpPort, remote_data_ip = PeerIP,
 			    local_data_tei = LocalTEI, remote_data_tei = RemoteTEI}, Args) ->
     dp_call(GtpPort, {delete_pdp_context, PeerIP, LocalTEI, RemoteTEI, Args}).
+
+get_accounting(#context{data_port = GtpPort, remote_data_ip = PeerIP,
+			local_data_tei = LocalTEI, remote_data_tei = RemoteTEI}) ->
+    dp_call(GtpPort, {get_accounting, PeerIP, LocalTEI, RemoteTEI}).
 
 %%%===================================================================
 %%% call/cast wrapper for gtp_port
