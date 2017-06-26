@@ -11,7 +11,8 @@
 -behavior(gtp_dp_api).
 
 %% API
--export([start_link/1, send/4, get_id/1,
+-export([validate_options/1,
+	 start_link/1, send/4, get_id/1,
 	 create_pdp_context/2,
 	 update_pdp_context/2,
 	 delete_pdp_context/2,
@@ -57,6 +58,25 @@ get_accounting(#context{data_port = GtpPort, remote_data_ip = PeerIP,
     dp_call(GtpPort, {get_accounting, PeerIP, LocalTEI, RemoteTEI}).
 
 %%%===================================================================
+%%% Options Validation
+%%%===================================================================
+
+-define(SocketDefaults, [{node, "invalid"},
+			 {name, "invalid"}]).
+
+validate_options(Values) ->
+     ergw_config:validate_options(fun validate_option/2, Values, ?SocketDefaults, map).
+
+validate_option(node, Value) when is_atom(Value) ->
+    Value;
+validate_option(name, Value) when is_atom(Value) ->
+    Value;
+validate_option(type, Value) when Value =:= 'gtp-u' ->
+    Value;
+validate_option(Opt, Value) ->
+    throw({error, {options, {Opt, Value}}}).
+
+%%%===================================================================
 %%% call/cast wrapper for gtp_port
 %%%===================================================================
 
@@ -83,11 +103,7 @@ dp_call(GtpPort, Request) ->
 %%% gen_server callbacks
 %%%===================================================================
 
-init([Name, SocketOpts]) ->
-    %% TODO: better config validation and handling
-    Node  = proplists:get_value(node, SocketOpts),
-    RemoteName = proplists:get_value(name, SocketOpts),
-
+init([Name, #{node := Node, name := RemoteName}]) ->
     State0 = #state{state = disconnected,
 		    tref = undefined,
 		    timeout = 10,
