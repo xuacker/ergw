@@ -155,6 +155,7 @@ handle_request(_ReqKey,
 
     gtp_context:register_remote_context(Context),
     dp_create_pdp_context(Context),
+    gtp_context:apply_session_policy(online, ActiveSessionOpts, Context, State),
 
     ResponseIEs = create_pdp_context_response(ActiveSessionOpts, IEs, Context),
     Reply = response(create_pdp_context_response, Context,

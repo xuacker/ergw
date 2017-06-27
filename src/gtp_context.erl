@@ -18,6 +18,7 @@
 	 register_remote_context/1, update_remote_context/2,
 	 enforce_restrictions/2,
 	 info/1,
+	 apply_session_policy/4,
 	 validate_options/3,
 	 validate_option/2]).
 
@@ -163,11 +164,20 @@ info(Context) ->
 enforce_restrictions(Msg, #context{restrictions = Restrictions} = Context) ->
     lists:foreach(fun(R) -> enforce_restriction(Context, Msg, R) end, Restrictions).
 
+apply_session_policy(GroupName, SessionOpts, Context, State)
+  when is_atom(GroupName) ->
+    apply_session_policy(atom_to_binary(GroupName, utf8), SessionOpts, Context, State);
+apply_session_policy(GroupName, _SessionOpts, Context,
+		     #{rules := Groups} = State) ->
+    {UL, DL} = maps:get(GroupName, Groups, {[], []}),
+    gtp_dp:activate_pcc_rules(Context, UL, DL).
+
 %%%===================================================================
 %%% Options Validation
 %%%===================================================================
 
 -define(ContextDefaults, [{data_paths, undefined},
+			  {rules,      []},
 			  {aaa,        []}]).
 
 -define(DefaultAAAOpts,
@@ -191,10 +201,20 @@ validate_option(sockets, Value) when is_list(Value) ->
     Value;
 validate_option(data_paths, Value) when is_list(Value) ->
     Value;
+validate_option(rules, Value) when is_list(Value); is_map(Value) ->
+    ergw_config:validate_options(fun validate_rules_option/2, Value, [], map);
 validate_option(aaa, Value) when is_list(Value); is_map(Value) ->
     ergw_config:opts_fold(fun validate_aaa_option/3, ?DefaultAAAOpts, Value);
 validate_option(Opt, Value) ->
     throw({error, {options, {Opt, Value}}}).
+
+validate_rules_option(Rule, {UL, DL} = Value)
+  when is_binary(Rule),
+       is_list(UL),
+       is_list(DL) ->
+    Value;
+validate_rules_option(Rule, Value) ->
+    throw({error, {options, {Rule, Value}}}).
 
 validate_aaa_option(Key, AppId, AAA)
   when Key == appid; Key == 'AAA-Application-Id' ->
@@ -231,7 +251,7 @@ validate_aaa_attr_option(Key, Setting, Value, _Attr) ->
 %%====================================================================
 
 init([CntlPort, Version, Interface,
-      #{data_paths := DPs, aaa := AAAOpts} = Opts]) ->
+      #{data_paths := DPs, rules := Rules, aaa := AAAOpts} = Opts]) ->
 
     lager:debug("init(~p)", [[CntlPort, Interface]]),
     process_flag(trap_exit, true),
@@ -254,6 +274,7 @@ init([CntlPort, Version, Interface,
       context   => Context,
       version   => Version,
       interface => Interface,
+      rules     => Rules,
       aaa_opts  => AAAOpts},
 
     Interface:init(Opts, State).

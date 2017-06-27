@@ -105,6 +105,7 @@ meck_init(Config) ->
     ok = meck:expect(gtp_dp, create_pdp_context, fun(_Context, _Args) -> ok end),
     ok = meck:expect(gtp_dp, update_pdp_context, fun(_Context, _Args) -> ok end),
     ok = meck:expect(gtp_dp, delete_pdp_context, fun(_Context, _Args) -> ok end),
+    ok = meck:expect(gtp_dp, activate_pcc_rules, fun(_Context, _UL, _DL) -> ok end),
 
     ok = meck:new(gtp_socket, [passthrough, no_link]),
 

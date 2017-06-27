@@ -16,7 +16,8 @@
 	 create_pdp_context/2,
 	 update_pdp_context/2,
 	 delete_pdp_context/2,
-	 get_accounting/1]).
+	 get_accounting/1,
+	 activate_pcc_rules/3]).
 
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
@@ -56,6 +57,9 @@ delete_pdp_context(#context{data_port = GtpPort, remote_data_ip = PeerIP,
 get_accounting(#context{data_port = GtpPort, remote_data_ip = PeerIP,
 			local_data_tei = LocalTEI, remote_data_tei = RemoteTEI}) ->
     dp_call(GtpPort, {get_accounting, PeerIP, LocalTEI, RemoteTEI}).
+
+activate_pcc_rules(_Context, _UL, _DL) ->
+    ok.
 
 %%%===================================================================
 %%% Options Validation
